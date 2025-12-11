@@ -300,44 +300,87 @@ function getCoordFromGeometry(geom){
   return drill(coords);
 }
 
-const treeIcon = L.icon({
-    iconUrl: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-        <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
-          <circle cx='16' cy='12' r='10' fill='#2e7d32'/>
-          <rect x='14' y='16' width='4' height='12' fill='#5d4037'/>
-        </svg>`),
-    iconSize: [28, 28],
-    iconAnchor: [14, 28]
-});
+function svgIcon(svg) {
+    return L.icon({
+        iconUrl: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg),
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
+    });
+}
 
-const poleIcon = L.icon({
-    iconUrl: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-        <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
-          <rect x='14' y='4' width='4' height='24' fill='#616161'/>
-          <rect x='8' y='8' width='16' height='3' fill='#424242'/>
-        </svg>`),
-    iconSize: [28, 28],
-    iconAnchor: [14, 28]
-});
+// ICONS
+const iconTree = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <circle cx='16' cy='12' r='10' fill='#2e7d32'/>
+  <rect x='14' y='16' width='4' height='12' fill='#5d4037'/>
+</svg>`);
 
-const houseIcon = L.icon({
-    iconUrl: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-        <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
-          <polygon points='16,4 28,14 4,14' fill='#c62828'/>
-          <rect x='8' y='14' width='16' height='12' fill='#ef5350'/>
-        </svg>`),
-    iconSize: [28, 28],
-    iconAnchor: [14, 28]
-});
+const iconPole = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='14' y='4' width='4' height='24' fill='#616161'/>
+  <rect x='10' y='10' width='12' height='3' fill='#444'/>
+</svg>`);
 
-const otherIcon = L.icon({
-    iconUrl: "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
-        <svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
-          <circle cx='16' cy='16' r='10' fill='#6b7280'/>
-        </svg>`),
-    iconSize: [26, 26],
-    iconAnchor: [13, 26]
-});
+const iconTransformer = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='6' y='10' width='20' height='14' fill='#2962ff'/>
+  <rect x='10' y='6' width='12' height='6' fill='#0039cb'/>
+</svg>`);
+
+const iconBridge = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='4' y='16' width='24' height='6' fill='#6d4c41'/>
+  <rect x='8' y='10' width='4' height='6' fill='#8d6e63'/>
+  <rect x='20' y='10' width='4' height='6' fill='#8d6e63'/>
+</svg>`);
+
+const iconCulvert = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='6' y='14' width='20' height='10' fill='#4e342e'/>
+  <circle cx='16' cy='22' r='6' fill='#90caf9'/>
+</svg>`);
+
+const iconHouse = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <polygon points='16,4 28,14 4,14' fill='#c62828'/>
+  <rect x='8' y='14' width='16' height='12' fill='#ef5350'/>
+</svg>`);
+
+const iconCommunity = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <circle cx='16' cy='16' r='10' fill='#ab47bc'/>
+</svg>`);
+
+const iconSign = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='10' y='6' width='12' height='10' fill='#ffca28'/>
+  <rect x='15' y='16' width='2' height='10' fill='#6d4c41'/>
+</svg>`);
+
+const iconSolarPole = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='14' y='4' width='4' height='24' fill='#78909c'/>
+  <rect x='8' y='4' width='16' height='6' fill='#0288d1'/>
+</svg>`);
+
+const iconTrafficLight = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='10' y='4' width='12' height='24' fill='#212121'/>
+  <circle cx='16' cy='9' r='3' fill='red'/>
+  <circle cx='16' cy='16' r='3' fill='yellow'/>
+  <circle cx='16' cy='23' r='3' fill='green'/>
+</svg>`);
+
+const iconWall = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <rect x='4' y='12' width='24' height='12' fill='#8d6e63'/>
+  <line x1='4' y1='18' x2='28' y2='18' stroke='#5d4037' stroke-width='2'/>
+</svg>`);
+
+const iconOther = svgIcon(`
+<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'>
+  <circle cx='16' cy='16' r='10' fill='#757575'/>
+</svg>`);
 
 // ---------- Load base layers ----------
 loadLayer("ESR.geojson", lgESR, {
@@ -396,29 +439,44 @@ loadLayer("RWM_CWM.geojson", lgRWM, {
 
 // ---------- Obstacles: symbolise by layer field (case-insensitive) ----------
 loadLayer("Obstacles.geojson", lgObstacles, {
-    pointToLayer: function(feature, latlng){
-        const props = feature.properties || {};
-        const raw = (props.layer || props.Layer || "").toString().toLowerCase();
+    pointToLayer: function(feature, latlng) {
 
-        let icon;
-        if (raw.includes("tree"))         icon = treeIcon;
-        else if (raw.includes("pole"))    icon = poleIcon;
-        else if (raw.includes("house") || raw.includes("building")) icon = houseIcon;
-        else                              icon = otherIcon;
+        const val = (feature.properties["Site Obstr"] || "").toString().toLowerCase();
+
+        let icon = iconOther;
+
+        if (val.includes("tree"))                     icon = iconTree;
+        else if (val.includes("electric pole transformer")) icon = iconTransformer;
+        else if (val.includes("electric pole private")) icon = iconPole;
+        else if (val.includes("electric pole"))       icon = iconPole;
+        else if (val.includes("solar pole"))          icon = iconSolarPole;
+        else if (val.includes("traffic light"))       icon = iconTrafficLight;
+        else if (val.includes("transformer"))         icon = iconTransformer;
+        else if (val.includes("bridge"))              icon = iconBridge;
+        else if (val.includes("culvert"))             icon = iconCulvert;
+        else if (val.includes("foundation pillar"))   icon = iconHouse;
+        else if (val.includes("private property"))    icon = iconHouse;
+        else if (val.includes("commercial"))          icon = iconHouse;
+        else if (val.includes("embankement wall"))    icon = iconWall;
+        else if (val.includes("public/community"))    icon = iconCommunity;
+        else if (val.includes("sign board"))          icon = iconSign;
 
         return L.marker(latlng, { icon: icon });
     },
 
-    onEachFeature: function(feature, layer){
-        // Tooltip
-        const props = feature.properties || {};
-        const label = props.Name_for_C || props.Site_Obstr || props.Details_of || "";
+    onEachFeature: function(feature, layer) {
+
+        const label = 
+            feature.properties["Site Obstr"] ||
+            feature.properties["Details_of"] ||
+            "";
+
         if(label) layer.bindTooltip(label, { className:"feature-label", direction:"right" });
 
-        // Full popup
-        layer.on("click", ()=> layer.bindPopup(buildPopup(props)).openPopup());
+        layer.on("click", ()=> layer.bindPopup(buildPopup(feature.properties)).openPopup());
     }
 });
+
 
 // LAYER TOGGLES
 document.getElementById("chkESR").onchange = e => e.target.checked ? map.addLayer(lgESR) : map.removeLayer(lgESR);
