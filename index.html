@@ -616,7 +616,7 @@ loadLayer("Zoning.geojson", lgZoning, {
 });
 
 loadLayer("RWM_CWM.geojson", lgRWM, {
-    style:function(){ return { color:'#6b7280', weight:2, fillOpacity:0.05 }; },
+    style:function(){ return { color:'#5a9280', weight:2, fillOpacity:0.05 }; },
     onEachFeature:function(feature, layer){ layer.on("click",()=> layer.bindPopup(buildPopup(feature.properties)).openPopup()); }
 });
 
@@ -691,6 +691,7 @@ function toggleLegend(el){
 
 </body>
 </html>
+
 
 
 
