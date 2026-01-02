@@ -93,7 +93,17 @@ small { font-size:12px; color:#666;}
   <div class="layer-row"><input type="checkbox" id="chkRoads" checked><label for="chkRoads">Roads / Rail / Waterway</label></div>
   <div class="layer-row"><input type="checkbox" id="chkZoning" checked><label for="chkZoning">Zoning</label></div>
   <div class="layer-row"><input type="checkbox" id="chkRWM" checked><label for="chkRWM">RWM / CWM</label></div>
-  <div class="layer-row"><input type="checkbox" id="chkObstacles" checked><label for="chkObstacles">Obstacles</label></div>
+  <h4>Obstacles</h4>
+
+<div class="layer-row"><input type="checkbox" id="chkTree" checked><label>Tree</label></div>
+<div class="layer-row"><input type="checkbox" id="chkPole" checked><label>Electric Pole</label></div>
+<div class="layer-row"><input type="checkbox" id="chkTransformer" checked><label>Transformer</label></div>
+<div class="layer-row"><input type="checkbox" id="chkBridge" checked><label>Bridge</label></div>
+<div class="layer-row"><input type="checkbox" id="chkCulvert" checked><label>Culvert</label></div>
+<div class="layer-row"><input type="checkbox" id="chkBuilding" checked><label>Building / Property</label></div>
+<div class="layer-row"><input type="checkbox" id="chkWall" checked><label>Wall / Embankment</label></div>
+<div class="layer-row"><input type="checkbox" id="chkOther" checked><label>Other</label></div>
+
 
   <hr>
 
@@ -288,7 +298,14 @@ const lgProposed  = L.layerGroup().addTo(map);
 const lgRoads     = L.layerGroup().addTo(map);
 const lgZoning    = L.layerGroup().addTo(map);
 const lgRWM       = L.layerGroup().addTo(map);
-const lgObstacles = L.layerGroup().addTo(map);
+const lgObstacleTree        = L.layerGroup().addTo(map);
+const lgObstaclePole        = L.layerGroup().addTo(map);
+const lgObstacleTransformer = L.layerGroup().addTo(map);
+const lgObstacleBridge      = L.layerGroup().addTo(map);
+const lgObstacleCulvert     = L.layerGroup().addTo(map);
+const lgObstacleBuilding    = L.layerGroup().addTo(map);
+const lgObstacleWall        = L.layerGroup().addTo(map);
+const lgObstacleOther       = L.layerGroup().addTo(map);
 
 const bounds = L.latLngBounds();
 
@@ -621,43 +638,65 @@ loadLayer("RWM_CWM.geojson", lgRWM, {
 });
 
 // ---------- Obstacles: symbolise by layer field (case-insensitive) ----------
-loadLayer("Obstacles.geojson", lgObstacles, {
-    pointToLayer: function(feature, latlng) {
+loadLayer("Obstacles.geojson", null, {
+  pointToLayer: function (feature, latlng) {
 
-        const val = (feature.properties["Site Obstr"] || "").toString().toLowerCase();
+    const val = (feature.properties["Site Obstr"] || "").toLowerCase();
+    let icon = iconOther;
+    let targetGroup = lgObstacleOther;
 
-        let icon = iconOther;
-
-        if (val.includes("tree"))                     icon = iconTree;
-        else if (val.includes("electric pole transformer")) icon = iconTransformer;
-        else if (val.includes("electric pole private")) icon = iconPole;
-        else if (val.includes("electric pole"))       icon = iconPole;
-        else if (val.includes("solar pole"))          icon = iconSolarPole;
-        else if (val.includes("traffic light"))       icon = iconTrafficLight;
-        else if (val.includes("transformer"))         icon = iconTransformer;
-        else if (val.includes("bridge"))              icon = iconBridge;
-        else if (val.includes("culvert"))             icon = iconCulvert;
-        else if (val.includes("foundation pillar"))   icon = iconHouse;
-        else if (val.includes("private property"))    icon = iconHouse;
-        else if (val.includes("commercial"))          icon = iconHouse;
-        else if (val.includes("embankement wall"))    icon = iconWall;
-        else if (val.includes("public/community"))    icon = iconCommunity;
-        else if (val.includes("sign board"))          icon = iconSign;
-
-        return L.marker(latlng, { icon: icon });
-    },
-
-    onEachFeature: function(feature, layer) {
-
-        const label = 
-            feature.properties["Site Obstr"] ||
-            feature.properties["Details_of"] ||
-            "";
-
-        if(label) layer.bindTooltip(label, { className:"feature-label", direction:"right" });
-
-        layer.on("click", ()=> layer.bindPopup(buildPopup(feature.properties)).openPopup());
+    if (val.includes("tree")) {
+      icon = iconTree;
+      targetGroup = lgObstacleTree;
     }
+    else if (val.includes("electric pole transformer")) {
+      icon = iconTransformer;
+      targetGroup = lgObstacleTransformer;
+    }
+    else if (val.includes("transformer")) {
+      icon = iconTransformer;
+      targetGroup = lgObstacleTransformer;
+    }
+    else if (val.includes("electric pole")) {
+      icon = iconPole;
+      targetGroup = lgObstaclePole;
+    }
+    else if (val.includes("solar pole")) {
+      icon = iconSolarPole;
+      targetGroup = lgObstaclePole;
+    }
+    else if (val.includes("traffic light")) {
+      icon = iconTrafficLight;
+      targetGroup = lgObstaclePole;
+    }
+    else if (val.includes("bridge")) {
+      icon = iconBridge;
+      targetGroup = lgObstacleBridge;
+    }
+    else if (val.includes("culvert")) {
+      icon = iconCulvert;
+      targetGroup = lgObstacleCulvert;
+    }
+    else if (
+      val.includes("private property") ||
+      val.includes("commercial") ||
+      val.includes("foundation pillar")
+    ) {
+      icon = iconHouse;
+      targetGroup = lgObstacleBuilding;
+    }
+    else if (val.includes("embankement wall")) {
+      icon = iconWall;
+      targetGroup = lgObstacleWall;
+    }
+
+    const marker = L.marker(latlng, { icon });
+    marker.bindPopup(buildPopup(feature.properties));
+    targetGroup.addLayer(marker);
+
+    bounds.extend(latlng);
+    return null; // IMPORTANT: prevent Leaflet from auto-adding
+  }
 });
 
 
@@ -668,7 +707,29 @@ document.getElementById("chkProposed").onchange = e => e.target.checked ? map.ad
 document.getElementById("chkRoads").onchange = e => e.target.checked ? map.addLayer(lgRoads) : map.removeLayer(lgRoads);
 document.getElementById("chkZoning").onchange = e => e.target.checked ? map.addLayer(lgZoning) : map.removeLayer(lgZoning);
 document.getElementById("chkRWM").onchange = e => e.target.checked ? map.addLayer(lgRWM) : map.removeLayer(lgRWM);
-document.getElementById("chkObstacles").onchange = e => e.target.checked ? map.addLayer(lgObstacles) : map.removeLayer(lgObstacles);
+document.getElementById("chkTree").onchange =
+  e => e.target.checked ? map.addLayer(lgObstacleTree) : map.removeLayer(lgObstacleTree);
+
+document.getElementById("chkPole").onchange =
+  e => e.target.checked ? map.addLayer(lgObstaclePole) : map.removeLayer(lgObstaclePole);
+
+document.getElementById("chkTransformer").onchange =
+  e => e.target.checked ? map.addLayer(lgObstacleTransformer) : map.removeLayer(lgObstacleTransformer);
+
+document.getElementById("chkBridge").onchange =
+  e => e.target.checked ? map.addLayer(lgObstacleBridge) : map.removeLayer(lgObstacleBridge);
+
+document.getElementById("chkCulvert").onchange =
+  e => e.target.checked ? map.addLayer(lgObstacleCulvert) : map.removeLayer(lgObstacleCulvert);
+
+document.getElementById("chkBuilding").onchange =
+  e => e.target.checked ? map.addLayer(lgObstacleBuilding) : map.removeLayer(lgObstacleBuilding);
+
+document.getElementById("chkWall").onchange =
+  e => e.target.checked ? map.addLayer(lgObstacleWall) : map.removeLayer(lgObstacleWall);
+
+document.getElementById("chkOther").onchange =
+  e => e.target.checked ? map.addLayer(lgObstacleOther) : map.removeLayer(lgObstacleOther);
 
 // BASEMAP TOGGLES
 document.getElementById("bmOSM").onchange = ()=>{ map.addLayer(osm); map.removeLayer(sat);};
@@ -691,6 +752,10 @@ function toggleLegend(el){
 
 </body>
 </html>
+
+
+
+
 
 
 
